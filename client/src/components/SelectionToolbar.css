@@ -1,0 +1,17 @@
+.selection-toolbar {
+  position: fixed;
+  z-index: 40;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: none;
+  background: var(--color-primary);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+}
+
+.selection-toolbar:disabled {
+  opacity: 0.7;
+}

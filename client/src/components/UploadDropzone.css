@@ -1,0 +1,25 @@
+.dropzone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 28px 16px;
+  text-align: center;
+  background: var(--color-surface);
+  transition: border-color 0.15s ease, background 0.15s ease;
+  min-height: 44px;
+}
+
+.dropzone--over {
+  border-color: var(--color-accent);
+  background: var(--color-surface-alt);
+}
+
+.dropzone__title {
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+
+.dropzone__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}

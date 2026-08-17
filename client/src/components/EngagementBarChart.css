@@ -1,0 +1,58 @@
+.engagement-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.engagement-empty {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.engagement-row {
+  display: grid;
+  grid-template-columns: minmax(0, 180px) 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.engagement-row__label {
+  font-size: 0.85rem;
+  color: var(--color-text);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.engagement-row__label:hover {
+  text-decoration: underline;
+}
+
+.engagement-row__track {
+  position: relative;
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.engagement-row__bar {
+  height: 16px;
+  max-height: 16px;
+  background: var(--color-primary);
+  border-radius: 0 4px 4px 0;
+  min-width: 4px;
+}
+
+.engagement-row__value {
+  margin-left: 8px;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 640px) {
+  .engagement-row {
+    grid-template-columns: minmax(0, 280px) 1fr;
+  }
+}
