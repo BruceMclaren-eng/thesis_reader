@@ -108,6 +108,8 @@ export default function PdfViewer({ fileUrl, onSelectionChange, onVisiblePageCha
   const [error, setError] = useState(null);
   const pageRefs = useRef(new Map());
   const scrollRootRef = useRef(null);
+  const pagesWrapRef = useRef(null);
+  const pinchRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -188,6 +190,62 @@ export default function PdfViewer({ fileUrl, onSelectionChange, onVisiblePageCha
     else pageRefs.current.delete(pageNumber);
   }, []);
 
+  useEffect(() => {
+    const scrollEl = scrollRootRef.current;
+    const wrapEl = pagesWrapRef.current;
+    if (!scrollEl || !wrapEl) return undefined;
+
+    function distance(touches) {
+      const [a, b] = touches;
+      return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    }
+
+    function midpoint(touches) {
+      const [a, b] = touches;
+      return { x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 };
+    }
+
+    function handleTouchStart(e) {
+      if (e.touches.length !== 2) return;
+      const rect = scrollEl.getBoundingClientRect();
+      const mid = midpoint(e.touches);
+      pinchRef.current = {
+        startDistance: distance(e.touches),
+        startZoom: zoom,
+        liveZoom: zoom,
+      };
+      wrapEl.style.transformOrigin = `${mid.x - rect.left + scrollEl.scrollLeft}px ${mid.y - rect.top + scrollEl.scrollTop}px`;
+    }
+
+    function handleTouchMove(e) {
+      if (e.touches.length !== 2 || !pinchRef.current) return;
+      e.preventDefault();
+      const scale = distance(e.touches) / pinchRef.current.startDistance;
+      const targetZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, pinchRef.current.startZoom * scale));
+      pinchRef.current.liveZoom = targetZoom;
+      wrapEl.style.transform = `scale(${targetZoom / pinchRef.current.startZoom})`;
+    }
+
+    function handleTouchEnd(e) {
+      if (e.touches.length >= 2 || !pinchRef.current) return;
+      const finalZoom = pinchRef.current.liveZoom;
+      pinchRef.current = null;
+      wrapEl.style.transform = "";
+      setZoom(+finalZoom.toFixed(2));
+    }
+
+    scrollEl.addEventListener("touchstart", handleTouchStart, { passive: true });
+    scrollEl.addEventListener("touchmove", handleTouchMove, { passive: false });
+    scrollEl.addEventListener("touchend", handleTouchEnd, { passive: true });
+    scrollEl.addEventListener("touchcancel", handleTouchEnd, { passive: true });
+    return () => {
+      scrollEl.removeEventListener("touchstart", handleTouchStart);
+      scrollEl.removeEventListener("touchmove", handleTouchMove);
+      scrollEl.removeEventListener("touchend", handleTouchEnd);
+      scrollEl.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, [zoom, pdf]);
+
   if (error) {
     return <div className="pdf-viewer__error">PDFの読み込みに失敗しました: {error}</div>;
   }
@@ -206,16 +264,19 @@ export default function PdfViewer({ fileUrl, onSelectionChange, onVisiblePageCha
       </div>
       <div className="pdf-viewer__scroll" ref={scrollRootRef}>
         {!pdf && <div className="pdf-viewer__loading">読み込み中…</div>}
-        {pdf &&
-          Array.from({ length: numPages }, (_, i) => i + 1).map((pageNumber) => (
-            <PageView
-              key={pageNumber}
-              pdf={pdf}
-              pageNumber={pageNumber}
-              zoom={zoom}
-              registerPageRef={registerPageRef}
-            />
-          ))}
+        {pdf && (
+          <div className="pdf-viewer__page-list" ref={pagesWrapRef}>
+            {Array.from({ length: numPages }, (_, i) => i + 1).map((pageNumber) => (
+              <PageView
+                key={pageNumber}
+                pdf={pdf}
+                pageNumber={pageNumber}
+                zoom={zoom}
+                registerPageRef={registerPageRef}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

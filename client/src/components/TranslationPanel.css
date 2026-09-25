@@ -97,8 +97,8 @@
 @media (min-width: 900px) {
   .translation-panel {
     position: static;
-    width: 380px;
-    flex: 0 0 380px;
+    width: var(--panel-width, 380px);
+    flex: 0 0 var(--panel-width, 380px);
     height: 100%;
     border-radius: 0;
     border-top: none;

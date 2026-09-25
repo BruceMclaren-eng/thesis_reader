@@ -1,6 +1,7 @@
 .pdf-viewer {
   display: flex;
   flex-direction: column;
+  flex: 1;
   height: 100%;
   min-width: 0;
   background: var(--color-surface-alt);
@@ -35,13 +36,18 @@
 .pdf-viewer__scroll {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
+  padding: 16px 12px 40px;
+}
+
+.pdf-viewer__page-list {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 14px;
-  padding: 16px 12px 40px;
+  width: fit-content;
+  margin: 0 auto;
 }
 
 .pdf-viewer__loading,
